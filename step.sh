@@ -79,7 +79,7 @@ else
 	log_done "Target ${target} and abi ${abi} installed"
 fi
 
-log_info "Creting AVD image ${name}"
+log_info "Creating AVD image ${name}"
 echo no | android --silent create avd --force --name $name --target ${target} --abi ${abi}
 
 envman add --key BITRISE_EMULATOR_NAME --value $name
