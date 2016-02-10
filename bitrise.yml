@@ -9,7 +9,7 @@ workflows:
         is_always_run: true
         inputs:
         - name: android-19-armeabi-v7a
-        - target: android-19
+        - platform: android-19
     - script:
         title: Output test
         is_always_run: true

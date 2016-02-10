@@ -38,8 +38,8 @@ if [ -z "${name}" ] ; then
 	log_fail "Missing required input: name"
 fi
 
-if [ -z "${target}" ] ; then
-	log_fail "Missing required input: target"
+if [ -z "${platform}" ] ; then
+	log_fail "Missing required input: platform"
 fi
 
 if [ -z "${abi}" ] ; then
@@ -50,37 +50,71 @@ fi
 # Print options
 log_info 'Configs:'
 log_details "name: ${name}"
-log_details "target: ${target}"
+log_details "platform: ${platform}"
 log_details "abi: ${abi}"
 
-log_info 'Check if target installed'
-target_installed=true
+#
+# Check if platform installed
+log_info 'Check if platform installed'
+platform_installed=true
+
+platform_path="${ANDROID_HOME}/platforms/${platform}"
+if [[ ! -d "${platform_path}" ]] ; then
+  platform_installed=false
+fi
 
 #
-# Check if target exist
-system_image_path="$ANDROID_HOME/system-images/${target}/${abi}"
+# Install platform if needed
+if [[ ${platform_installed} == true ]] ; then
+  log_done "Platform ${platform} installed"
+else
+  log_details "Platform ${platform} not installed"
+
+  log_info "Installing ${platform}"
+  out=$(echo y | android update sdk --no-ui --all --filter ${platform})
+  if [ $? -ne 0 ]; then
+    echo "out: $out"
+  fi
+  log_done "Platform ${platform} installed"
+fi
+
+#
+# Check if system image installed
+log_info 'Check if system image installed'
+system_image_installed=true
+
+system_image_path="${ANDROID_HOME}/system-images/${platform}/${abi}"
 if [ ! -d "${system_image_path}" ] ; then
-	system_image_path="$ANDROID_HOME/system-images/${target}/default/${abi}"
+	system_image_path="${ANDROID_HOME}/system-images/${platform}/default/${abi}"
 	if [ ! -d "${system_image_path}" ] ; then
-		target_installed=false
+		system_image_installed=false
 	fi
 fi
 
 #
-# Install target
-if [[ $target_installed == true ]] ; then
-	log_done "Target ${target} and abi ${abi} installed"
-else
-	log_details "Target ${target} and abi ${abi} not installed"
+# Install system image if needed
+system_image="sys-img-${abi}-${platform}"
 
-	log_info "Installing ${target} and abi ${abi}"
-	sys_image="sys-img-${abi}-${target}"
-	echo y | android update sdk --no-ui --all --filter ${sys_image}
-	log_done "Target ${target} and abi ${abi} installed"
+if [[ ${system_image_installed} == true ]] ; then
+	log_done "System image ${system_image} installed"
+else
+	log_details "System image ${system_image} not installed"
+
+	log_info "Installing ${system_image}"
+	out=$(echo y | android update sdk --no-ui --all --filter ${system_image})
+  if [ $? -ne 0 ]; then
+    echo "out: $out"
+  fi
+	log_done "System image ${system_image} installed"
 fi
 
+#
+# Create AVD image
 log_info "Creating AVD image ${name}"
-echo no | android --silent create avd --force --name $name --target ${target} --abi ${abi}
+out=$(echo no | android create avd --force --name ${name} --target ${platform} --abi ${abi})
+if [ $? -ne 0 ]; then
+  echo "out: $out"
+fi
 
-envman add --key BITRISE_EMULATOR_NAME --value $name
-log_done "AVD image $name ready to use 🚀"
+envman add --key BITRISE_EMULATOR_NAME --value ${name}
+log_done "AVD image ${name} ready to use 🚀"
