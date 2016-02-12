@@ -21,13 +21,11 @@ inputs:
       description: |
         Name of the new AVD.
       is_required: true
-  - platform:
+  - platform: android-19
     opts:
       title: "Target platform of the new AVD"
       description: |
         Target platform of the new AVD.
-
-        Example: android-19
       is_required: true
   - abi: armeabi-v7a
     opts:
