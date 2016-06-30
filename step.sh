@@ -6,26 +6,59 @@ set -e
 # --- Functions
 # -----------------------
 
-log_fail() { # red
-  echo -e "\033[31m$1\033[0m"
-  exit 1
+RESTORE='\033[0m'
+RED='\033[00;31m'
+YELLOW='\033[00;33m'
+BLUE='\033[00;34m'
+GREEN='\033[00;32m'
+
+function color_echo {
+	color=$1
+	msg=$2
+	echo -e "${color}${msg}${RESTORE}"
 }
 
-log_warn() { # yellow
-  echo -e "\033[33m$1\033[0m"
+function echo_fail {
+	msg=$1
+	echo
+	color_echo "${RED}" "${msg}"
+	exit 1
 }
 
-log_info() { # blue
-echo
-  echo -e "\033[34m$1\033[0m"
+function echo_warn {
+	msg=$1
+	color_echo "${YELLOW}" "${msg}"
 }
 
-log_details() { # white
-  echo -e "  \033[97m$1\033[0m"
+function echo_info {
+	msg=$1
+	echo
+	color_echo "${BLUE}" "${msg}"
 }
 
-log_done() { # green
-  echo -e "  \033[32m$1\033[0m"
+function echo_details {
+	msg=$1
+	echo "  ${msg}"
+}
+
+function echo_done {
+	msg=$1
+	color_echo "${GREEN}" "  ${msg}"
+}
+
+function validate_required_input {
+	key=$1
+	value=$2
+	if [ -z "${value}" ] ; then
+		echo_fail "[!] Missing required input: ${key}"
+	fi
+}
+
+function print_and_run {
+  cmd="$1"
+  echo_details "${cmd}"
+	echo
+  eval "${cmd}"
 }
 
 # -----------------------
@@ -34,31 +67,34 @@ log_done() { # green
 
 #
 # Validate options
+validate_required_input "name", "${name}"
+
 if [ -z "${name}" ] ; then
-	log_fail "Missing required input: name"
+	echo_fail "Missing required input: name"
 fi
 
 if [ -z "${platform}" ] ; then
-	log_fail "Missing required input: platform"
+	echo_fail "Missing required input: platform"
 fi
 
 if [ -z "${abi}" ] ; then
-	log_fail "Missing required input: abi"
+	echo_fail "Missing required input: abi"
 fi
 
 #
 # Print options
-log_info 'Configs:'
-log_details "name: ${name}"
-log_details "platform: ${platform}"
-log_details "abi: ${abi}"
+echo_info 'Configs:'
+echo_details "name: ${name}"
+echo_details "platform: ${platform}"
+echo_details "abi: ${abi}"
 
 #
 # Check if platform installed
-log_info 'Check if platform installed'
+echo_info 'Check if platform installed'
 platform_installed=true
 
 platform_path="${ANDROID_HOME}/platforms/${platform}"
+echo_details "checking path: ${platform_path}"
 if [[ ! -d "${platform_path}" ]] ; then
   platform_installed=false
 fi
@@ -66,26 +102,32 @@ fi
 #
 # Install platform if needed
 if [[ ${platform_installed} == true ]] ; then
-  log_done "Platform ${platform} installed"
+  echo_done "platform ${platform} installed"
 else
-  log_details "Platform ${platform} not installed"
+  echo_details "platform ${platform} not installed"
+  echo_details "installing ${platform}"
 
-  log_info "Installing ${platform}"
-  out=$(echo y | android update sdk --no-ui --all --filter ${platform})
-  if [ $? -ne 0 ]; then
-    echo "out: $out"
+	install_cmd="echo y | android update sdk --no-ui --all --filter ${platform}"
+	print_and_run "${install_cmd}"
+  if [ $? -ne 0 ] ; then
+    echo_fail "command failed"
   fi
-  log_done "Platform ${platform} installed"
+
+  echo_done "platform ${platform} installed"
 fi
 
 #
 # Check if system image installed
-log_info 'Check if system image installed'
+echo_info 'Check if system image installed'
 system_image_installed=true
 
 system_image_path="${ANDROID_HOME}/system-images/${platform}/${abi}"
+echo_details "checking path: ${system_image_path}"
+
 if [ ! -d "${system_image_path}" ] ; then
 	system_image_path="${ANDROID_HOME}/system-images/${platform}/default/${abi}"
+	echo_details "checking path: ${system_image_path}"
+
 	if [ ! -d "${system_image_path}" ] ; then
 		system_image_installed=false
 	fi
@@ -96,25 +138,40 @@ fi
 system_image="sys-img-${abi}-${platform}"
 
 if [[ ${system_image_installed} == true ]] ; then
-	log_done "System image ${system_image} installed"
+	echo_done "system image ${system_image} installed"
 else
-	log_details "System image ${system_image} not installed"
+	echo_details "system image ${system_image} not installed"
 
-	log_info "Installing ${system_image}"
-	out=$(echo y | android update sdk --no-ui --all --filter ${system_image})
-  if [ $? -ne 0 ]; then
-    echo "out: $out"
-  fi
-	log_done "System image ${system_image} installed"
+	echo_info "Installing ${system_image}"
+
+	install_cmd="echo y | android update sdk --no-ui --all --filter ${system_image}"
+	print_and_run "${install_cmd}"
+
+	# Check if install succed
+	system_image_path="${ANDROID_HOME}/system-images/${platform}/${abi}"
+	echo_details "checking path: ${system_image_path}"
+
+	if [ ! -d "${system_image_path}" ] ; then
+		system_image_path="${ANDROID_HOME}/system-images/${platform}/default/${abi}"
+		echo_details "checking path: ${system_image_path}"
+
+		if [ ! -d "${system_image_path}" ] ; then
+			echo_fail "system image ${system_image} not installed"
+		fi
+	fi
+	##
+
+	echo_done "system image ${system_image} installed"
 fi
 
 #
 # Create AVD image
-log_info "Creating AVD image ${name}"
-out=$(echo no | android create avd --force --name ${name} --target ${platform} --abi ${abi})
-if [ $? -ne 0 ]; then
-  echo "out: $out"
+echo_info "Creating AVD image ${name}"
+create_cmd="echo no | android create avd --force --name ${name} --target ${platform} --abi ${abi}"
+print_and_run "${create_cmd}"
+if [ $? -ne 0 ] ; then
+  echo_fail "command failed"
 fi
 
 envman add --key BITRISE_EMULATOR_NAME --value ${name}
-log_done "AVD image ${name} ready to use 🚀"
+echo_done "AVD image ${name} ready to use 🚀"
