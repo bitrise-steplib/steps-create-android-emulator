@@ -10,6 +10,8 @@ app:
   - EMULATOR_ABI: armeabi-v7a
 
 workflows:
+  # ----------------------------------------------------------------
+  # --- workflow to Step Test
   test:
     steps:
     - change-workdir:
@@ -35,9 +37,9 @@ workflows:
         title: Change workdir
         inputs:
         - path: ./_tmp
+    # ---
     - path::./:
         title: Create android-23-armeabi-v7a
-        run_if: .IsCI
         inputs:
         - name: android-23-armeabi-v7a
         - platform: android-23
@@ -48,9 +50,9 @@ workflows:
         inputs:
         - content: |
             echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
+    # ---        
     - path::./:
         title: Create android-21-armeabi-v7a
-        run_if: .IsCI
         inputs:
         - name: android-21-armeabi-v7a
         - platform: android-21
@@ -61,9 +63,9 @@ workflows:
         inputs:
         - content: |
             echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
+    # ---
     - path::./:
         title: Create android-23-x86
-        run_if: .IsCI
         inputs:
         - name: android-23-x86
         - platform: android-23
