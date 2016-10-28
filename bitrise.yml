@@ -1,62 +1,136 @@
-format_version: 1.1.0
+format_version: 1.3.0
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+
+app:
+  envs:
+  - RELEASE_VERSION: 0.9.1
+
+  - EMULATOR_NAME: android-23-armeabi-v7a
+  - EMULATOR_PLATFORM: android-23
+  - EMULATOR_ABI: armeabi-v7a
 
 workflows:
   test:
     steps:
-    - path::./:
-        title: Step test
-        is_always_run: true
+    - change-workdir:
+        title: Change workdir
         inputs:
-        - name: android-19-armeabi-v7a
+        - path: ./_tmp
+    - path::./:
+        title: Create android-23-armeabi-v7a
+        inputs:
+        - name: $EMULATOR_NAME
+        - platform: $EMULATOR_PLATFORM
+        - abi: $EMULATOR_ABI
     - script:
         title: Output test
         is_always_run: true
         inputs:
         - content: |
-            echo "BITRISE_EMULATOR_NAME: ${BITRISE_EMULATOR_NAME}"
+            echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
 
+  ci:
+    steps:
+    - change-workdir:
+        title: Change workdir
+        inputs:
+        - path: ./_tmp
+    - path::./:
+        title: Create android-23-armeabi-v7a
+        run_if: .IsCI
+        inputs:
+        - name: android-23-armeabi-v7a
+        - platform: android-23
+        - abi: armeabi-v7a
+    - script:
+        title: Output test
+        is_always_run: true
+        inputs:
+        - content: |
+            echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
+    - path::./:
+        title: Create android-21-armeabi-v7a
+        run_if: .IsCI
+        inputs:
+        - name: android-21-armeabi-v7a
+        - platform: android-21
+        - abi: armeabi-v7a
+    - script:
+        title: Output test
+        is_always_run: true
+        inputs:
+        - content: |
+            echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
+    - path::./:
+        title: Create android-23-x86
+        run_if: .IsCI
+        inputs:
+        - name: android-23-x86
+        - platform: android-23
+        - abi: x86
+    - script:
+        title: Output test
+        is_always_run: true
+        inputs:
+        - content: |
+            echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
 
   # ----------------------------------------------------------------
-  # --- workflows to Share this step into a Step Library
-  share-this-step:
-    envs:
-      # if you want to share this step into a StepLib
-      - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
-      - STEP_ID_IN_STEPLIB: create-android-emulator
-      - STEP_GIT_VERION_TAG_TO_SHARE: 0.1.0
-      - STEP_GIT_CLONE_URL: https://github.com/bitrise-steplib/steps-create-android-emulator.git
-    description: |-
-      If this is the first time you try to share a Step you should
-      first call: $ bitrise share
+  # --- workflow to create Release version
+  create-release:
+    steps:
+    - script:
+        title:
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -ex
+            go get -u github.com/bitrise-tools/releaseman
+            export CI=true
+            releaseman create --version "$RELEASE_VERSION"
 
-      This will print you a guide, and information about how Step sharing
-      works. Please read it at least once!
-
-      As noted in the Step sharing guide you'll have to fork the
-      StepLib you want to share this step into. Once you're done with forking
-      the repository you should set your own fork's git clone URL
-      in the `.bitrise.secrets.yml` file, or here in the `envs` section,
-      as the value of the `MY_STEPLIB_REPO_FORK_GIT_URL` environment.
-
-      You're now ready to share this Step, just make sure that
-      the `STEP_ID_IN_STEPLIB` and `STEP_GIT_VERION_TAG_TO_SHARE`
-      environments are set to the desired values!
-
-      To share this Step into a StepLib you can just run: $ bitrise run share-this-step
-
-      Once it finishes the only thing left is to actually create a Pull Request,
-      the way described in the guide printed at the end of the process.
+  # ----------------------------------------------------------------
+  # --- workflow to Share this step into a Step Library
+  audit-this-step:
     steps:
     - script:
         inputs:
         - content: |-
             #!/bin/bash
-            set -e
-            set -x
+            set -ex
+            stepman audit --step-yml ./step.yml
 
+  share-this-step:
+    envs:
+      # if you want to share this step into a StepLib
+      - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
+      - STEP_ID_IN_STEPLIB: create-android-emulator
+      - STEP_GIT_VERION_TAG_TO_SHARE: $RELEASE_VERSION
+      - STEP_GIT_CLONE_URL: https://github.com/bitrise-steplib/steps-create-android-emulator.git
+    description: |-
+      If this is the first time you try to share a Step you should
+      first call: $ bitrise share
+      This will print you a guide, and information about how Step sharing
+      works. Please read it at least once!
+      As noted in the Step sharing guide you'll have to fork the
+      StepLib you want to share this step into. Once you're done with forking
+      the repository you should set your own fork's git clone URL
+      in the `.bitrise.secrets.yml` file, or here in the `envs` section,
+      as the value of the `MY_STEPLIB_REPO_FORK_GIT_URL` environment.
+      You're now ready to share this Step, just make sure that
+      the `STEP_ID_IN_STEPLIB` and `STEP_GIT_VERION_TAG_TO_SHARE`
+      environments are set to the desired values!
+      To share this Step into a StepLib you can just run: $ bitrise run share-this-step
+      Once it finishes the only thing left is to actually create a Pull Request,
+      the way described in the guide printed at the end of the process.
+    before_run:
+    - audit-this-step
+    steps:
+    - script:
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -ex
             bitrise share start -c ${MY_STEPLIB_REPO_FORK_GIT_URL}
-
             bitrise share create --stepid ${STEP_ID_IN_STEPLIB} --tag ${STEP_GIT_VERION_TAG_TO_SHARE} --git ${STEP_GIT_CLONE_URL}
-
             bitrise share finish

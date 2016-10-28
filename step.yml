@@ -33,7 +33,6 @@ inputs:
       description: |
         The ABI to use for the AVD.
       is_required: true
-      is_dont_change_value: true
 outputs:
   - BITRISE_EMULATOR_NAME:
     opts:
