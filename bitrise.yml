@@ -61,19 +61,6 @@ workflows:
         inputs:
         - content: |
             echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
-    # ---
-    - path::./:
-        title: Create android-23-x86
-        inputs:
-        - name: android-23-x86
-        - platform: android-23
-        - abi: x86
-    - script:
-        title: Output test
-        is_always_run: true
-        inputs:
-        - content: |
-            echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
 
   # ----------------------------------------------------------------
   # --- workflow to create Release version
