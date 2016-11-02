@@ -43,7 +43,6 @@ workflows:
         inputs:
         - name: android-23-armeabi-v7a
         - platform: android-23
-        - abi: armeabi-v7a
     - script:
         title: Output test
         is_always_run: true
@@ -56,7 +55,6 @@ workflows:
         inputs:
         - name: android-21-armeabi-v7a
         - platform: android-21
-        - abi: armeabi-v7a
     - script:
         title: Output test
         is_always_run: true
