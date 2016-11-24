@@ -14,6 +14,15 @@ type_tags:
 is_requires_admin_user: false
 is_always_run: false
 is_skippable: false
+deps:
+  brew:
+  - name: go
+  apt_get:
+  - name: golang
+    bin_name: go
+toolkit:
+  go:
+    package_name: github.com/bitrise-steplib/steps-create-android-emulator
 inputs:
   - name:
     opts:
@@ -34,6 +43,16 @@ inputs:
         The ABI to use for the AVD.
       is_required: true
       is_dont_change_value: true
+  - options: "--skin WVGA800"
+    opts:
+      title: Additional options for `android create avd` call
+      description: |-
+        Options added to the end of the `android create avd` call:
+
+        `android create avd --force --name name --target platform --abi abi options`
+
+        You can use multiple options, separated by a space
+        character. Example: `--skin WVGA800`
 outputs:
   - BITRISE_EMULATOR_NAME:
     opts:
