@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/bitrise-io/go-utils/cmdex"
+	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/kballard/go-shellquote"
@@ -19,20 +20,22 @@ const (
 
 // ConfigsModel ...
 type ConfigsModel struct {
-	Name        string
-	Platform    string
-	Abi         string
-	Options     string
-	AndroidHome string
+	Name                         string
+	Platform                     string
+	Abi                          string
+	Options                      string
+	AndroidHome                  string
+	CustomHardwareProfileContent string
 }
 
 func createConfigsModelFromEnvs() ConfigsModel {
 	return ConfigsModel{
-		Name:        os.Getenv("name"),
-		Platform:    os.Getenv("platform"),
-		Abi:         os.Getenv("abi"),
-		Options:     os.Getenv("options"),
-		AndroidHome: os.Getenv("ANDROID_HOME"),
+		Name:     os.Getenv("name"),
+		Platform: os.Getenv("platform"),
+		Abi:      os.Getenv("abi"),
+		Options:  os.Getenv("options"),
+		CustomHardwareProfileContent: os.Getenv("custom_hardware_profile_content"),
+		AndroidHome:                  os.Getenv("ANDROID_HOME"),
 	}
 }
 
@@ -43,6 +46,8 @@ func (configs ConfigsModel) print() {
 	log.Detail("- Abi: %s", configs.Abi)
 	log.Detail("- Options: %s", configs.Options)
 	log.Detail("- AndroidHome: %s", configs.AndroidHome)
+	log.Detail("- CustomHardwareProfileContent:")
+	log.Detail(configs.CustomHardwareProfileContent)
 }
 
 func (configs ConfigsModel) validate() error {
@@ -222,6 +227,31 @@ func main() {
 
 	if err := cmd.Run(); err != nil {
 		fail("Failed to create image, error: %s", err)
+	}
+	// ---
+
+	//
+	// Write custom hardware profile
+	if configs.CustomHardwareProfileContent != "" {
+		fmt.Println()
+		log.Info("Applying custom hardware profile")
+
+		homeDir := pathutil.UserHomeDir()
+		avdImageDir := filepath.Join(homeDir, ".android/avd", configs.Name+".avd")
+
+		if exist, err := pathutil.IsDirExists(avdImageDir); err != nil {
+			fail("Failed to check if avd image dir (%s) exists, error: %s", avdImageDir, err)
+		} else if !exist {
+			fail("The avd image (%s) created but not found at: %s", configs.Name, avdImageDir)
+		}
+
+		configPth := filepath.Join(avdImageDir, "config.ini")
+		if err := fileutil.WriteStringToFile(configPth, configs.CustomHardwareProfileContent); err != nil {
+			fail("Failed to write custom hardware profile, error: %s", err)
+		}
+
+		log.Done("config.ini path: %s", configPth)
+		fmt.Println()
 	}
 	// ---
 

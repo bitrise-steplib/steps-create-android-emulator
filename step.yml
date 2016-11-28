@@ -53,6 +53,28 @@ inputs:
 
         You can use multiple options, separated by a space
         character. Example: `--skin WVGA800`
+  - custom_hardware_profile_content:
+    opts:
+      title: Custom Hardware Profile Content
+      description: |-
+        The value of this input will be written into `${name}.avd/config.ini` file,
+        to let the created emulator use your custom hardware profile.
+
+        Format example:
+        ```
+        avd.ini.encoding=UTF-8
+        abi.type=armeabi-v7a
+        hw.cpu.arch=arm
+        hw.cpu.model=cortex-a8
+        hw.lcd.density=240
+        hw.ramSize=512
+        image.sysdir.1=system-images/android-21/default/armeabi-v7a/
+        skin.name=WVGA800
+        skin.path=platforms/android-21/skins/WVGA800
+        tag.display=Default
+        tag.id=default
+        vm.heapSize=48
+        ```
 outputs:
   - BITRISE_EMULATOR_NAME:
     opts:
