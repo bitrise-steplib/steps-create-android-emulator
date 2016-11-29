@@ -24,8 +24,8 @@ type ConfigsModel struct {
 	Platform                     string
 	Abi                          string
 	Options                      string
-	AndroidHome                  string
 	CustomHardwareProfileContent string
+	AndroidHome                  string
 }
 
 func createConfigsModelFromEnvs() ConfigsModel {
@@ -45,8 +45,8 @@ func (configs ConfigsModel) print() {
 	log.Detail("- Platform: %s", configs.Platform)
 	log.Detail("- Abi: %s", configs.Abi)
 	log.Detail("- Options: %s", configs.Options)
-	log.Detail("- AndroidHome: %s", configs.AndroidHome)
 	log.Detail("- CustomHardwareProfileContent:")
+	log.Detail("- AndroidHome: %s", configs.AndroidHome)
 	log.Detail(configs.CustomHardwareProfileContent)
 }
 
