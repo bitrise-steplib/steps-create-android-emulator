@@ -43,7 +43,7 @@ inputs:
         The ABI to use for the AVD.
       is_required: true
       is_dont_change_value: true
-  - options: "--skin WVGA800"
+  - options: ""
     opts:
       title: Additional options for `android create avd` call
       description: |-
