@@ -1,6 +1,14 @@
-## Changelog (Current version: 0.9.2)
+## Changelog (Current version: 1.0.0)
 
 -----------------
+
+### 1.0.0 (2016 Nov 29)
+
+* [246d2f5] gitignore, bitrise.yml fix
+* [0924480] v1.0.0
+* [63ba3ff] prepare for 1.0.0
+* [b33bd37] remove default option
+* [95fecc9] custom emulator options (#8)
 
 ### 0.9.2 (2016 Nov 23)
 
@@ -17,4 +25,4 @@
 
 -----------------
 
-Updated: 2016 Nov 23
+Updated: 2016 Nov 29

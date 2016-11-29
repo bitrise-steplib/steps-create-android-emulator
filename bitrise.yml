@@ -176,7 +176,7 @@ workflows:
       # if you want to share this step into a StepLib
       - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
       - STEP_ID_IN_STEPLIB: create-android-emulator
-      - STEP_GIT_VERION_TAG_TO_SHARE: $RELEASE_VERSION
+      - STEP_GIT_VERION_TAG_TO_SHARE: $STEP_VERSION
       - STEP_GIT_CLONE_URL: https://github.com/bitrise-steplib/steps-create-android-emulator.git
     description: |-
       If this is the first time you try to share a Step you should
