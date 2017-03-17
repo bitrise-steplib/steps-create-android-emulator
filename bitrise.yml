@@ -140,6 +140,9 @@ workflows:
             set -ex
             go get -u -v github.com/tools/godep
 
+            go get github.com/davecgh/go-spew/spew
+            go get github.com/pmezard/go-difflib/difflib
+
             rm -rf ./Godeps
             rm -rf ./vendor
 

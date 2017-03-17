@@ -7,10 +7,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bitrise-io/go-utils/cmdex"
+	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
+	"github.com/bitrise-tools/go-android/avdmanager"
+	"github.com/bitrise-tools/go-android/sdkcomponent"
+	"github.com/bitrise-tools/go-android/sdkmanager"
 	"github.com/kballard/go-shellquote"
 )
 
@@ -40,14 +43,14 @@ func createConfigsModelFromEnvs() ConfigsModel {
 }
 
 func (configs ConfigsModel) print() {
-	log.Info("Configs:")
-	log.Detail("- Name: %s", configs.Name)
-	log.Detail("- Platform: %s", configs.Platform)
-	log.Detail("- Abi: %s", configs.Abi)
-	log.Detail("- Options: %s", configs.Options)
-	log.Detail("- CustomHardwareProfileContent:")
-	log.Detail("- AndroidHome: %s", configs.AndroidHome)
-	log.Detail(configs.CustomHardwareProfileContent)
+	log.Infof("Configs:")
+	log.Printf("- Name: %s", configs.Name)
+	log.Printf("- Platform: %s", configs.Platform)
+	log.Printf("- Abi: %s", configs.Abi)
+	log.Printf("- Options: %s", configs.Options)
+	log.Printf("- CustomHardwareProfileContent:")
+	log.Printf("- AndroidHome: %s", configs.AndroidHome)
+	log.Printf(configs.CustomHardwareProfileContent)
 }
 
 func (configs ConfigsModel) validate() error {
@@ -67,12 +70,12 @@ func (configs ConfigsModel) validate() error {
 }
 
 func fail(format string, v ...interface{}) {
-	log.Error(format, v...)
+	log.Errorf(format, v...)
 	os.Exit(1)
 }
 
 func exportEnvironmentWithEnvman(keyStr, valueStr string) error {
-	cmd := cmdex.NewCommand("envman", "add", "--key", keyStr)
+	cmd := command.New("envman", "add", "--key", keyStr)
 	cmd.SetStdin(strings.NewReader(valueStr))
 	return cmd.Run()
 }
@@ -90,119 +93,91 @@ func main() {
 	//
 	// Check is platform installed
 	fmt.Println()
-	log.Info("Check if platform installed")
+	log.Infof("Check if platform installed")
 
-	platformInstalled := false
-
-	platformPth := filepath.Join(configs.AndroidHome, "platforms", configs.Platform)
-	if exist, err := pathutil.IsPathExists(platformPth); err != nil {
-		fail("Failed to check if path (%s) exists, error: %s", platformPth, err)
-	} else {
-		platformInstalled = exist
+	manager, err := sdkmanager.New(configs.AndroidHome)
+	if err != nil {
+		fail("Failed to create sdk manager, error: %s", err)
 	}
 
-	log.Done("installed: %v", platformInstalled)
+	platformComponent := sdkcomponent.Platform{
+		Version: configs.Platform,
+	}
+
+	platformInstalled, err := manager.IsInstalled(platformComponent)
+	if err != nil {
+		fail("Failed to check if platform (%s) installed, error: %s", platformComponent.Version)
+	}
+
+	log.Donef("installed: %v", platformInstalled)
 	// ---
 
 	//
 	// Install platform
 	if !platformInstalled {
 		fmt.Println()
-		log.Info("Installing: %s", configs.Platform)
+		log.Infof("Installing: %s", configs.Platform)
 
-		args := []string{"android", "update", "sdk", "--no-ui", "--all", "--filter", configs.Platform}
-		cmd := cmdex.NewCommand(args[0], args[1:]...)
-		cmd.SetStdin(strings.NewReader("y"))
-		cmd.SetStdout(os.Stdout)
-		cmd.SetStdout(os.Stderr)
+		installCmd := manager.InstallCommand(platformComponent)
+		installCmd.SetStdout(os.Stdout)
+		installCmd.SetStderr(os.Stderr)
 
 		fmt.Println()
-		log.Done("$ %s", cmdex.PrintableCommandArgs(false, args))
+		log.Donef("$ %s", installCmd.PrintableCommandArgs())
 		fmt.Println()
 
-		if err := cmd.Run(); err != nil {
+		if err := installCmd.Run(); err != nil {
 			fail("Failed to install platform, error: %s", err)
 		}
 
-		log.Done("Installed")
+		log.Donef("Installed")
 	}
 	// ---
 
 	//
 	// Check if system image installed
 	fmt.Println()
-	log.Info("Check if system image installed")
+	log.Infof("Check if system image installed")
 
-	systemImageInstalled := false
-
-	systemImagePth := filepath.Join(configs.AndroidHome, "system-images", configs.Platform, configs.Abi)
-	log.Detail("checking path: %s", systemImagePth)
-
-	if exist, err := pathutil.IsPathExists(systemImagePth); err != nil {
-		fail("Failed to check if path (%s) exists, error: %s", systemImagePth, err)
-	} else if !exist {
-		systemImagePth = filepath.Join(configs.AndroidHome, "system-images", configs.Platform, "default", configs.Abi)
-		log.Detail("checking path: %s", systemImagePth)
-
-		if exist, err := pathutil.IsPathExists(systemImagePth); err != nil {
-			fail("Failed to check if path (%s) exists, error: %s", systemImagePth, err)
-		} else {
-			systemImageInstalled = exist
-		}
-	} else {
-		systemImageInstalled = true
+	systemImageComponent := sdkcomponent.SystemImage{
+		Platform: configs.Platform,
+		ABI:      configs.Abi,
 	}
 
-	log.Done("installed: %v", systemImageInstalled)
+	systemImageInstalled, err := manager.IsInstalled(systemImageComponent)
+	if err != nil {
+		fail("Failed to check if system image (platform: %s abi: %s) installed, error: %s", systemImageComponent.Platform, systemImageComponent.ABI)
+	}
+
+	log.Donef("installed: %v", systemImageInstalled)
 	// ---
 
 	//
 	// Install system image
 	if !systemImageInstalled {
-		systemImage := fmt.Sprintf("sys-img-%s-%s", configs.Abi, configs.Platform)
+		fmt.Println()
+		log.Infof("Installing system image (platform: %s abi: %s)", systemImageComponent.Platform, systemImageComponent.ABI)
+
+		installCmd := manager.InstallCommand(systemImageComponent)
+		installCmd.SetStdout(os.Stdout)
+		installCmd.SetStderr(os.Stderr)
 
 		fmt.Println()
-		log.Info("Installing: %s", systemImage)
-
-		args := []string{"android", "update", "sdk", "--no-ui", "--all", "--filter", systemImage}
-		cmd := cmdex.NewCommand(args[0], args[1:]...)
-		cmd.SetStdin(strings.NewReader("y"))
-		cmd.SetStdout(os.Stdout)
-		cmd.SetStdout(os.Stderr)
-
-		fmt.Println()
-		log.Done("$ %s", cmdex.PrintableCommandArgs(false, args))
+		log.Donef("$ %s", installCmd.PrintableCommandArgs())
 		fmt.Println()
 
-		if err := cmd.Run(); err != nil {
-			fail("Failed to install system image, error: %s", err)
+		if err := installCmd.Run(); err != nil {
+			fail("Failed to install platform, error: %s", err)
 		}
 
-		// Check if install succed
-		systemImagePth := filepath.Join(configs.AndroidHome, "system-images", configs.Platform, configs.Abi)
-		log.Detail("checking if system image created at path: %s", systemImagePth)
-
-		if exist, err := pathutil.IsPathExists(systemImagePth); err != nil {
-			fail("Failed to check if path (%s) exists, error: %s", systemImagePth, err)
-		} else if !exist {
-			systemImagePth = filepath.Join(configs.AndroidHome, "system-images", configs.Platform, "default", configs.Abi)
-			log.Detail("checking if system image created at path: %s", systemImagePth)
-
-			if exist, err := pathutil.IsPathExists(systemImagePth); err != nil {
-				fail("Failed to check if path (%s) exists, error: %s", systemImagePth, err)
-			} else if !exist {
-				fail("system image: %s not installed", systemImage)
-			}
-		}
-
-		log.Done("Installed")
+		log.Donef("Installed")
 	}
 	// ---
 
 	//
 	// Create AVD image
 	fmt.Println()
-	log.Info("Creating AVD image")
+	log.Infof("Creating AVD image")
 
 	options := []string{}
 	if configs.Options != "" {
@@ -213,17 +188,31 @@ func main() {
 		options = opts
 	}
 
-	args := []string{"android", "create", "avd", "--force", "--name", configs.Name, "--target", configs.Platform, "--abi", configs.Abi}
-	args = append(args, options...)
+	avdManager, err := avdmanager.New(configs.AndroidHome)
+	if err != nil {
+		fail("Failed to create avd manager, error: %s", err)
+	}
 
-	cmd := cmdex.NewCommand(args[0], args[1:]...)
+	cmd := avdManager.CreateAVDCommand(configs.Name, systemImageComponent, options...)
 	cmd.SetStdin(strings.NewReader("n"))
 	cmd.SetStdout(os.Stdout)
 	cmd.SetStdout(os.Stderr)
 
 	fmt.Println()
-	log.Done("$ %s", cmdex.PrintableCommandArgs(false, args))
+	log.Donef("$ %s", cmd.PrintableCommandArgs())
 	fmt.Println()
+
+	// args := []string{"android", "create", "avd", "--force", "--name", configs.Name, "--target", configs.Platform, "--abi", configs.Abi}
+	// args = append(args, options...)
+
+	// cmd := command.New(args[0], args[1:]...)
+	// cmd.SetStdin(strings.NewReader("n"))
+	// cmd.SetStdout(os.Stdout)
+	// cmd.SetStdout(os.Stderr)
+
+	// fmt.Println()
+	// log.Donef("$ %s", command.PrintableCommandArgs(false, args))
+	// fmt.Println()
 
 	if err := cmd.Run(); err != nil {
 		fail("Failed to create image, error: %s", err)
@@ -234,7 +223,7 @@ func main() {
 	// Write custom hardware profile
 	if configs.CustomHardwareProfileContent != "" {
 		fmt.Println()
-		log.Info("Applying custom hardware profile")
+		log.Infof("Applying custom hardware profile")
 
 		homeDir := pathutil.UserHomeDir()
 		avdImageDir := filepath.Join(homeDir, ".android/avd", configs.Name+".avd")
@@ -250,7 +239,7 @@ func main() {
 			fail("Failed to write custom hardware profile, error: %s", err)
 		}
 
-		log.Done("config.ini path: %s", configPth)
+		log.Donef("config.ini path: %s", configPth)
 		fmt.Println()
 	}
 	// ---
@@ -258,5 +247,5 @@ func main() {
 	if err := exportEnvironmentWithEnvman(bitriseEmulatorName, configs.Name); err != nil {
 		fail("Failed to export %s, error: %s", bitriseEmulatorName, err)
 	}
-	log.Done("Emaultor name is exported in environment variable: %s (value: %s)", bitriseEmulatorName, configs.Name)
+	log.Donef("Emaultor name is exported in environment variable: %s (value: %s)", bitriseEmulatorName, configs.Name)
 }
