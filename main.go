@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/bitrise-io/go-utils/command"
+	"github.com/bitrise-io/go-utils/errorutil"
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
@@ -26,6 +27,7 @@ type ConfigsModel struct {
 	Name                         string
 	Platform                     string
 	Abi                          string
+	Tag                          string
 	Options                      string
 	CustomHardwareProfileContent string
 	AndroidHome                  string
@@ -36,6 +38,7 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		Name:     os.Getenv("name"),
 		Platform: os.Getenv("platform"),
 		Abi:      os.Getenv("abi"),
+		Tag:      os.Getenv("tag"),
 		Options:  os.Getenv("options"),
 		CustomHardwareProfileContent: os.Getenv("custom_hardware_profile_content"),
 		AndroidHome:                  os.Getenv("ANDROID_HOME"),
@@ -47,6 +50,7 @@ func (configs ConfigsModel) print() {
 	log.Printf("- Name: %s", configs.Name)
 	log.Printf("- Platform: %s", configs.Platform)
 	log.Printf("- Abi: %s", configs.Abi)
+	log.Printf("- Tag: %s", configs.Tag)
 	log.Printf("- Options: %s", configs.Options)
 	log.Printf("- CustomHardwareProfileContent:")
 	log.Printf("- AndroidHome: %s", configs.AndroidHome)
@@ -57,15 +61,30 @@ func (configs ConfigsModel) validate() error {
 	if configs.Name == "" {
 		return errors.New("no Name parameter specified")
 	}
+
 	if configs.Platform == "" {
 		return errors.New("no Platform parameter specified")
 	}
+
 	if configs.Abi == "" {
 		return errors.New("no Abi parameter specified")
+	} else if configs.Abi != "armeabi-v7a" {
+		return fmt.Errorf("invalid Abi parameter specified (%s), valid option: armeabi-v7a", configs.Abi)
 	}
+
+	if configs.Tag == "" {
+		return errors.New("no Tag parameter specified")
+	} else if configs.Tag != "default" &&
+		configs.Tag != "google_apis" &&
+		configs.Tag != "android-tv" &&
+		configs.Tag != "android-wear" {
+		return fmt.Errorf("invalid Tag parameter specified (%s), valid options: [default, google_apis, android-tv, android-wear]", configs.Tag)
+	}
+
 	if configs.AndroidHome == "" {
 		return errors.New("no ANDROID_HOME env set")
 	}
+
 	return nil
 }
 
@@ -141,12 +160,13 @@ func main() {
 
 	systemImageComponent := sdkcomponent.SystemImage{
 		Platform: configs.Platform,
+		Tag:      configs.Tag,
 		ABI:      configs.Abi,
 	}
 
 	systemImageInstalled, err := manager.IsInstalled(systemImageComponent)
 	if err != nil {
-		fail("Failed to check if system image (platform: %s abi: %s) installed, error: %s", systemImageComponent.Platform, systemImageComponent.ABI)
+		fail("Failed to check if system image (platform: %s abi: %s tag: %s) installed, error: %s", systemImageComponent.Platform, systemImageComponent.ABI, systemImageComponent.Tag)
 	}
 
 	log.Donef("installed: %v", systemImageInstalled)
@@ -156,7 +176,7 @@ func main() {
 	// Install system image
 	if !systemImageInstalled {
 		fmt.Println()
-		log.Infof("Installing system image (platform: %s abi: %s)", systemImageComponent.Platform, systemImageComponent.ABI)
+		log.Infof("Installing system image (platform: %s abi: %s tag: %s)", systemImageComponent.Platform, systemImageComponent.ABI, systemImageComponent.Tag)
 
 		installCmd := manager.InstallCommand(systemImageComponent)
 		installCmd.SetStdout(os.Stdout)
@@ -202,19 +222,10 @@ func main() {
 	log.Donef("$ %s", cmd.PrintableCommandArgs())
 	fmt.Println()
 
-	// args := []string{"android", "create", "avd", "--force", "--name", configs.Name, "--target", configs.Platform, "--abi", configs.Abi}
-	// args = append(args, options...)
-
-	// cmd := command.New(args[0], args[1:]...)
-	// cmd.SetStdin(strings.NewReader("n"))
-	// cmd.SetStdout(os.Stdout)
-	// cmd.SetStdout(os.Stderr)
-
-	// fmt.Println()
-	// log.Donef("$ %s", command.PrintableCommandArgs(false, args))
-	// fmt.Println()
-
 	if err := cmd.Run(); err != nil {
+		if errorutil.IsExitStatusError(err) {
+
+		}
 		fail("Failed to create image, error: %s", err)
 	}
 	// ---

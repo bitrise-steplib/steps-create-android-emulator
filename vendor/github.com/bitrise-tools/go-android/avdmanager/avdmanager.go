@@ -50,6 +50,10 @@ func (model Model) CreateAVDCommand(name string, systemImage sdkcomponent.System
 		return command.New(model.binPth, args...)
 	}
 
-	args := append([]string{"create", "avd", "--force", "--package", systemImage.GetSDKStylePath(), "--name", name, "--abi", systemImage.ABI}, options...)
+	args := []string{"create", "avd", "--force", "--package", systemImage.GetSDKStylePath(), "--name", name, "--abi", systemImage.ABI}
+	if systemImage.Tag != "" && systemImage.Tag != "default" {
+		args = append(args, "--tag", systemImage.Tag)
+	}
+	args = append(args, options...)
 	return command.New(model.binPth, args...)
 }

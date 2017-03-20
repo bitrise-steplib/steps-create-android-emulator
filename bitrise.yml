@@ -45,6 +45,7 @@ workflows:
         inputs:
         - name: android-24-armeabi-v7a
         - platform: android-24
+        - tag: google_apis
     - script:
         title: Output test
         is_always_run: true

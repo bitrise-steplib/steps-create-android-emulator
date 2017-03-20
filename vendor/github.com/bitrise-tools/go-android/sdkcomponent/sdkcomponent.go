@@ -74,8 +74,8 @@ func (component Platform) InstallPathInAndroidHome() string {
 // SystemImage ...
 type SystemImage struct {
 	Platform string
-	Type     string
 	ABI      string
+	Tag      string
 
 	SDKStylePath       string
 	LegacySDKStylePath string
@@ -87,12 +87,12 @@ func (component SystemImage) GetSDKStylePath() string {
 		return component.SDKStylePath
 	}
 
-	componentType := "default"
-	if component.Type != "" {
-		componentType = component.Type
+	tag := "default"
+	if component.Tag != "" {
+		tag = component.Tag
 	}
 
-	return fmt.Sprintf("system-images;%s;%s;%s", component.Platform, componentType, component.ABI)
+	return fmt.Sprintf("system-images;%s;%s;%s", component.Platform, tag, component.ABI)
 }
 
 // GetLegacySDKStylePath ...
@@ -102,10 +102,10 @@ func (component SystemImage) GetLegacySDKStylePath() string {
 	}
 
 	platform := component.Platform
-	if component.Type != "" && component.Type != "default" {
+	if component.Tag != "" && component.Tag != "default" {
 		split := strings.Split(component.Platform, "-")
 		if len(split) == 2 {
-			platform = component.Type + "-" + split[1]
+			platform = component.Tag + "-" + split[1]
 		}
 	}
 
@@ -114,10 +114,10 @@ func (component SystemImage) GetLegacySDKStylePath() string {
 
 // InstallPathInAndroidHome ...
 func (component SystemImage) InstallPathInAndroidHome() string {
-	componentType := "default"
-	if component.Type != "" {
-		componentType = component.Type
+	componentTag := "default"
+	if component.Tag != "" {
+		componentTag = component.Tag
 	}
 
-	return filepath.Join("system-images", component.Platform, componentType, component.ABI)
+	return filepath.Join("system-images", component.Platform, componentTag, component.ABI)
 }
