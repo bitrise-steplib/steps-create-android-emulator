@@ -149,6 +149,12 @@ func main() {
 			fail("Failed to install platform, error: %s", err)
 		}
 
+		if installed, err := manager.IsInstalled(platformComponent); err != nil {
+			fail("Failed to check if platform (%s) installed, error: %s", platformComponent.Version)
+		} else if !installed {
+			fail("Failed to install platform")
+		}
+
 		log.Donef("Installed")
 	}
 	// ---
@@ -164,9 +170,11 @@ func main() {
 		ABI:      configs.Abi,
 	}
 
+	log.Printf("Checking path: %s", systemImageComponent.InstallPathInAndroidHome())
+
 	systemImageInstalled, err := manager.IsInstalled(systemImageComponent)
 	if err != nil {
-		fail("Failed to check if system image (platform: %s abi: %s tag: %s) installed, error: %s", systemImageComponent.Platform, systemImageComponent.ABI, systemImageComponent.Tag)
+		fail("Failed to check if system image (platform: %s abi: %s tag: %s) installed, error: %s", systemImageComponent.Platform, systemImageComponent.ABI, systemImageComponent.Tag, err)
 	}
 
 	log.Donef("installed: %v", systemImageInstalled)
@@ -188,6 +196,12 @@ func main() {
 
 		if err := installCmd.Run(); err != nil {
 			fail("Failed to install platform, error: %s", err)
+		}
+
+		if installed, err := manager.IsInstalled(systemImageComponent); err != nil {
+			fail("Failed to check if system image (platform: %s abi: %s tag: %s) installed, error: %s", systemImageComponent.Platform, systemImageComponent.ABI, systemImageComponent.Tag, err)
+		} else if !installed {
+			fail("Failed to install system image (platform: %s abi: %s tag: %s)", systemImageComponent.Platform, systemImageComponent.ABI, systemImageComponent.Tag)
 		}
 
 		log.Donef("Installed")
