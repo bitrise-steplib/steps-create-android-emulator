@@ -7,7 +7,6 @@ import (
 	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-tools/go-android/sdkcomponent"
-	"github.com/bitrise-tools/go-android/sdkmanager"
 )
 
 // Model ...
@@ -18,12 +17,17 @@ type Model struct {
 
 // New ...
 func New(androidHome string) (*Model, error) {
-	binPth := filepath.Join(androidHome, "tools", "bin", "avdmanager")
+	if exist, err := pathutil.IsDirExists(androidHome); err != nil {
+		return nil, err
+	} else if !exist {
+		return nil, fmt.Errorf("android home not exists at: %s", androidHome)
+	}
 
-	legacy, err := sdkmanager.IsLegacySDKVersion(androidHome)
+	binPth := filepath.Join(androidHome, "tools", "bin", "avdmanager")
+	avdManagerExists, err := pathutil.IsPathExists(filepath.Join(androidHome, "tools", "bin", "avdmanager"))
 	if err != nil {
 		return nil, err
-	} else if legacy {
+	} else if !avdManagerExists {
 		binPth = filepath.Join(androidHome, "tools", "android")
 	}
 
@@ -34,7 +38,7 @@ func New(androidHome string) (*Model, error) {
 	}
 
 	return &Model{
-		legacy: legacy,
+		legacy: !avdManagerExists,
 		binPth: binPth,
 	}, nil
 }

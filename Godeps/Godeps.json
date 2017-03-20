@@ -32,15 +32,15 @@
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/avdmanager",
-			"Rev": "f5d32d167a1589013c0065f7f40ece62e7caeada"
+			"Rev": "498877fe14bc287a387131844dfd560b9073fb6c"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdkcomponent",
-			"Rev": "f5d32d167a1589013c0065f7f40ece62e7caeada"
+			"Rev": "498877fe14bc287a387131844dfd560b9073fb6c"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdkmanager",
-			"Rev": "f5d32d167a1589013c0065f7f40ece62e7caeada"
+			"Rev": "498877fe14bc287a387131844dfd560b9073fb6c"
 		},
 		{
 			"ImportPath": "github.com/kballard/go-shellquote",

@@ -16,8 +16,8 @@ type Model struct {
 	binPth      string
 }
 
-// IsLegacySDKVersion ...
-func IsLegacySDKVersion(androidHome string) (bool, error) {
+// IsLegacySDKManager ...
+func IsLegacySDKManager(androidHome string) (bool, error) {
 	if exist, err := pathutil.IsDirExists(androidHome); err != nil {
 		return false, err
 	} else if !exist {
@@ -32,7 +32,7 @@ func IsLegacySDKVersion(androidHome string) (bool, error) {
 func New(androidHome string) (*Model, error) {
 	binPth := filepath.Join(androidHome, "tools", "bin", "sdkmanager")
 
-	legacy, err := IsLegacySDKVersion(androidHome)
+	legacy, err := IsLegacySDKManager(androidHome)
 	if err != nil {
 		return nil, err
 	} else if legacy {
