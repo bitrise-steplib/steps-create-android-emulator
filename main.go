@@ -138,6 +138,7 @@ func main() {
 		log.Infof("Installing: %s", configs.Platform)
 
 		installCmd := manager.InstallCommand(platformComponent)
+		installCmd.SetStdin(strings.NewReader("y"))
 		installCmd.SetStdout(os.Stdout)
 		installCmd.SetStderr(os.Stderr)
 
@@ -187,6 +188,7 @@ func main() {
 		log.Infof("Installing system image (platform: %s abi: %s tag: %s)", systemImageComponent.Platform, systemImageComponent.ABI, systemImageComponent.Tag)
 
 		installCmd := manager.InstallCommand(systemImageComponent)
+		installCmd.SetStdin(strings.NewReader("y"))
 		installCmd.SetStdout(os.Stdout)
 		installCmd.SetStderr(os.Stderr)
 
