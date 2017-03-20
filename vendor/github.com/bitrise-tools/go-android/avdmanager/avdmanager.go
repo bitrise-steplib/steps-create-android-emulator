@@ -34,7 +34,7 @@ func New(androidHome string) (*Model, error) {
 	if exist, err := pathutil.IsPathExists(binPth); err != nil {
 		return nil, err
 	} else if !exist {
-		return nil, fmt.Errorf("no sdk manager tool found at: %s", binPth)
+		return nil, fmt.Errorf("no avd manager tool found at: %s", binPth)
 	}
 
 	return &Model{
