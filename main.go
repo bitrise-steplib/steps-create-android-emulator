@@ -52,8 +52,8 @@ func (configs ConfigsModel) print() {
 	log.Printf("- Abi: %s", configs.Abi)
 	log.Printf("- Tag: %s", configs.Tag)
 	log.Printf("- Options: %s", configs.Options)
-	log.Printf("- CustomHardwareProfileContent:")
 	log.Printf("- AndroidHome: %s", configs.AndroidHome)
+	log.Printf("- CustomHardwareProfileContent:")
 	log.Printf(configs.CustomHardwareProfileContent)
 }
 
