@@ -7,10 +7,8 @@ source_code_url: https://github.com/bitrise-steplib/steps-create-android-emulato
 support_url: https://github.com/bitrise-steplib/steps-create-android-emulator/issues
 host_os_tags:
   - ubuntu
-project_type_tags:
-  - android
 type_tags:
-  - emulator
+  - utility
 is_requires_admin_user: false
 is_always_run: false
 is_skippable: false
@@ -43,13 +41,28 @@ inputs:
         The ABI to use for the AVD.
       is_required: true
       is_dont_change_value: true
+  - tag: "default"
+    opts:
+      title: "The sys-img tag to use for the AVD"
+      description: |
+        The sys-img tag to use for the AVD.
+      is_required: true
+      value_options:
+      - "default"
+      - "google_apis"
+      - "android-tv"
+      - "android-wear"
   - options: ""
     opts:
       title: Additional options for `android create avd` call
       description: |-
-        Options added to the end of the `android create avd` call:
+        Options added to the end of the `android create avd` or `avdmanager create avd` call:
 
         `android create avd --force --name name --target platform --abi abi options`
+
+        or 
+
+        `avdmanager create avd --force --package PACKAGE --name name --abi abi options`
 
         You can use multiple options, separated by a space
         character. Example: `--skin WVGA800`

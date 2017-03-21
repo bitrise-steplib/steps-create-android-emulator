@@ -45,6 +45,7 @@ workflows:
         inputs:
         - name: android-24-armeabi-v7a
         - platform: android-24
+        - tag: google_apis
     - script:
         title: Output test
         is_always_run: true
@@ -139,6 +140,9 @@ workflows:
             #!/bin/bash
             set -ex
             go get -u -v github.com/tools/godep
+
+            go get github.com/davecgh/go-spew/spew
+            go get github.com/pmezard/go-difflib/difflib
 
             rm -rf ./Godeps
             rm -rf ./vendor
