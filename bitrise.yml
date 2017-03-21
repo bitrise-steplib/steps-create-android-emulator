@@ -5,8 +5,9 @@ app:
   envs:
   - STEP_VERSION: 1.0.0
 
-  - EMULATOR_NAME: android-24-armeabi-v7a
-  - EMULATOR_PLATFORM: android-24
+  - EMULATOR_NAME: android-22-armeabi-v7a
+  - EMULATOR_PLATFORM: android-22
+  - EMULATOR_TAG: google_apis
 
 workflows:
   # ----------------------------------------------------------------
@@ -24,6 +25,7 @@ workflows:
         inputs:
         - name: $EMULATOR_NAME
         - platform: $EMULATOR_PLATFORM
+        - tag: $EMULATOR_TAG
     - script:
         title: Output test
         is_always_run: true
@@ -43,9 +45,9 @@ workflows:
     - path::./:
         title: Create android-24-armeabi-v7a
         inputs:
-        - name: android-24-armeabi-v7a
-        - platform: android-24
-        - tag: google_apis
+        - name: $EMULATOR_NAME
+        - platform: $EMULATOR_PLATFORM
+        - tag: $EMULATOR_TAG
     - script:
         title: Output test
         is_always_run: true
