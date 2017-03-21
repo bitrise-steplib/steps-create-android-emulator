@@ -24,7 +24,7 @@ func New(androidHome string) (*Model, error) {
 	}
 
 	binPth := filepath.Join(androidHome, "tools", "bin", "avdmanager")
-	avdManagerExists, err := pathutil.IsPathExists(filepath.Join(androidHome, "tools", "bin", "avdmanager"))
+	avdManagerExists, err := pathutil.IsPathExists(binPth)
 	if err != nil {
 		return nil, err
 	} else if !avdManagerExists {
