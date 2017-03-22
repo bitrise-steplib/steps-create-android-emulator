@@ -1,6 +1,13 @@
-## Changelog (Current version: 1.0.0)
+## Changelog (Current version: 1.1.0)
 
 -----------------
+
+### 1.1.0 (2017 Mar 22)
+
+* [eec0918] prepare for 1.1.0
+* [84549f8] godeps update
+* [0820c2c] ci updates
+* [fb3ed31] use go-android packages (#11)
 
 ### 1.0.0 (2016 Nov 29)
 
@@ -25,4 +32,4 @@
 
 -----------------
 
-Updated: 2016 Nov 29
+Updated: 2017 Mar 22
