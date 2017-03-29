@@ -13,6 +13,7 @@ import (
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-tools/go-android/avdmanager"
+	"github.com/bitrise-tools/go-android/sdk"
 	"github.com/bitrise-tools/go-android/sdkcomponent"
 	"github.com/bitrise-tools/go-android/sdkmanager"
 	"github.com/kballard/go-shellquote"
@@ -114,7 +115,12 @@ func main() {
 	fmt.Println()
 	log.Infof("Check if platform installed")
 
-	manager, err := sdkmanager.New(configs.AndroidHome)
+	androidSdk, err := sdk.New(configs.AndroidHome)
+	if err != nil {
+		fail("Failed to create sdk, error: %s", err)
+	}
+
+	manager, err := sdkmanager.New(androidSdk)
 	if err != nil {
 		fail("Failed to create sdk manager, error: %s", err)
 	}
@@ -224,7 +230,7 @@ func main() {
 		options = opts
 	}
 
-	avdManager, err := avdmanager.New(configs.AndroidHome)
+	avdManager, err := avdmanager.New(androidSdk)
 	if err != nil {
 		fail("Failed to create avd manager, error: %s", err)
 	}
