@@ -1,6 +1,11 @@
-## Changelog (Current version: 1.1.0)
+## Changelog (Current version: 1.1.1)
 
 -----------------
+
+### 1.1.1 (2017 Mar 29)
+
+* [5b3b379] Prepare for 1.1.1
+* [f49c336] updated go-android (#12)
 
 ### 1.1.0 (2017 Mar 22)
 
@@ -32,4 +37,4 @@
 
 -----------------
 
-Updated: 2017 Mar 22
+Updated: 2017 Mar 29
