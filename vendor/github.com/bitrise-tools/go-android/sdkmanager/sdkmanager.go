@@ -66,11 +66,3 @@ func (model Model) InstallCommand(component sdkcomponent.Model) *command.Model {
 	}
 	return command.New(model.binPth, component.GetSDKStylePath())
 }
-
-// UpdateToolsCommand ...
-func (model Model) UpdateToolsCommand() *command.Model {
-	if model.legacy {
-		return command.New(model.binPth, "update", "sdk", "--no-ui", "--all", "--filter", "tools")
-	}
-	return command.New(model.binPth, "tools")
-}
