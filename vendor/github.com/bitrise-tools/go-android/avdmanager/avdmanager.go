@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"os"
+
 	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-tools/go-android/sdk"
 	"github.com/bitrise-tools/go-android/sdkcomponent"
+	"github.com/bitrise-tools/go-android/sdkmanager"
 )
 
 // Model ...
@@ -16,14 +19,40 @@ type Model struct {
 	binPth string
 }
 
+// IsLegacyAVDManager ...
+func IsLegacyAVDManager(androidHome string) (bool, error) {
+	exist, err := pathutil.IsPathExists(filepath.Join(androidHome, "tools", "bin", "avdmanager"))
+	return !exist, err
+}
+
 // New ...
 func New(sdk sdk.AndroidSdkInterface) (*Model, error) {
 	binPth := filepath.Join(sdk.GetAndroidHome(), "tools", "bin", "avdmanager")
-	avdManagerExists, err := pathutil.IsPathExists(binPth)
+
+	legacySdk, err := sdkmanager.IsLegacySDKManager(sdk.GetAndroidHome())
 	if err != nil {
 		return nil, err
-	} else if !avdManagerExists {
+	}
+
+	legacyAvd, err := IsLegacyAVDManager(sdk.GetAndroidHome())
+	if err != nil {
+		return nil, err
+	} else if legacyAvd && legacySdk {
 		binPth = filepath.Join(sdk.GetAndroidHome(), "tools", "android")
+	} else if legacyAvd && !legacySdk {
+		binPth = filepath.Join(sdk.GetAndroidHome(), "tools", "android")
+		sdkManager, err := sdkmanager.New(sdk)
+		if err == nil {
+			updateCmd := sdkManager.UpdateToolsCommand()
+			updateCmd.SetStderr(os.Stderr)
+			updateCmd.SetStdout(os.Stdout)
+			if err := updateCmd.Run(); err == nil {
+				legacyAvd, err = IsLegacyAVDManager(sdk.GetAndroidHome())
+				if err == nil && !legacyAvd {
+					binPth = filepath.Join(sdk.GetAndroidHome(), "tools", "bin", "avdmanager")
+				}
+			}
+		}
 	}
 
 	if exist, err := pathutil.IsPathExists(binPth); err != nil {
@@ -33,7 +62,7 @@ func New(sdk sdk.AndroidSdkInterface) (*Model, error) {
 	}
 
 	return &Model{
-		legacy: !avdManagerExists,
+		legacy: legacyAvd,
 		binPth: binPth,
 	}, nil
 }
