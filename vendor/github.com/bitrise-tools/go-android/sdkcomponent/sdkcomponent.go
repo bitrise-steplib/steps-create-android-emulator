@@ -13,6 +13,33 @@ type Model interface {
 	InstallPathInAndroidHome() string
 }
 
+// SDKTool ...
+type SDKTool struct {
+	SDKStylePath       string
+	LegacySDKStylePath string
+}
+
+// GetSDKStylePath ...
+func (component SDKTool) GetSDKStylePath() string {
+	if component.SDKStylePath != "" {
+		return component.SDKStylePath
+	}
+	return "tools"
+}
+
+// GetLegacySDKStylePath ...
+func (component SDKTool) GetLegacySDKStylePath() string {
+	if component.LegacySDKStylePath != "" {
+		return component.LegacySDKStylePath
+	}
+	return "tools"
+}
+
+// InstallPathInAndroidHome ...
+func (component SDKTool) InstallPathInAndroidHome() string {
+	return "tools"
+}
+
 // BuildTool ...
 type BuildTool struct {
 	Version string
