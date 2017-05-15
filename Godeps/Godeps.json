@@ -32,19 +32,19 @@
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/avdmanager",
-			"Rev": "c4a1c5148098da7f6334bb4e9a96336ccdeaef33"
+			"Rev": "ffb12c23bdea0bdf7e69d46af97b299ab749941c"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdk",
-			"Rev": "c4a1c5148098da7f6334bb4e9a96336ccdeaef33"
+			"Rev": "ffb12c23bdea0bdf7e69d46af97b299ab749941c"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdkcomponent",
-			"Rev": "c4a1c5148098da7f6334bb4e9a96336ccdeaef33"
+			"Rev": "ffb12c23bdea0bdf7e69d46af97b299ab749941c"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdkmanager",
-			"Rev": "c4a1c5148098da7f6334bb4e9a96336ccdeaef33"
+			"Rev": "ffb12c23bdea0bdf7e69d46af97b299ab749941c"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-steputils/tools",
