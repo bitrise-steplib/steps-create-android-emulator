@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bitrise-io/go-utils/command"
-	"github.com/bitrise-io/go-utils/errorutil"
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
@@ -16,6 +14,7 @@ import (
 	"github.com/bitrise-tools/go-android/sdk"
 	"github.com/bitrise-tools/go-android/sdkcomponent"
 	"github.com/bitrise-tools/go-android/sdkmanager"
+	"github.com/bitrise-tools/go-steputils/tools"
 	"github.com/kballard/go-shellquote"
 )
 
@@ -92,12 +91,6 @@ func (configs ConfigsModel) validate() error {
 func fail(format string, v ...interface{}) {
 	log.Errorf(format, v...)
 	os.Exit(1)
-}
-
-func exportEnvironmentWithEnvman(keyStr, valueStr string) error {
-	cmd := command.New("envman", "add", "--key", keyStr)
-	cmd.SetStdin(strings.NewReader(valueStr))
-	return cmd.Run()
 }
 
 func main() {
@@ -238,16 +231,13 @@ func main() {
 	cmd := avdManager.CreateAVDCommand(configs.Name, systemImageComponent, options...)
 	cmd.SetStdin(strings.NewReader("n"))
 	cmd.SetStdout(os.Stdout)
-	cmd.SetStdout(os.Stderr)
+	cmd.SetStderr(os.Stderr)
 
 	fmt.Println()
 	log.Donef("$ %s", cmd.PrintableCommandArgs())
 	fmt.Println()
 
 	if err := cmd.Run(); err != nil {
-		if errorutil.IsExitStatusError(err) {
-
-		}
 		fail("Failed to create image, error: %s", err)
 	}
 	// ---
@@ -277,7 +267,7 @@ func main() {
 	}
 	// ---
 
-	if err := exportEnvironmentWithEnvman(bitriseEmulatorName, configs.Name); err != nil {
+	if err := tools.ExportEnvironmentWithEnvman(bitriseEmulatorName, configs.Name); err != nil {
 		fail("Failed to export %s, error: %s", bitriseEmulatorName, err)
 	}
 	log.Donef("Emaultor name is exported in environment variable: %s (value: %s)", bitriseEmulatorName, configs.Name)
