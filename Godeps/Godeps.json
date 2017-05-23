@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/bitrise-steplib/steps-create-android-emulator",
-	"GoVersion": "go1.8",
+	"GoVersion": "go1.7",
 	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
@@ -8,47 +8,47 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/colorstring",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "23863e62407a03d0643cfc2f0583467dcb33826f"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/command",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "23863e62407a03d0643cfc2f0583467dcb33826f"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/errorutil",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "23863e62407a03d0643cfc2f0583467dcb33826f"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/fileutil",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "23863e62407a03d0643cfc2f0583467dcb33826f"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/log",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "23863e62407a03d0643cfc2f0583467dcb33826f"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/pathutil",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "23863e62407a03d0643cfc2f0583467dcb33826f"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/avdmanager",
-			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
+			"Rev": "7fa01f47177345bf699a3c5700f13838841655f2"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdk",
-			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
+			"Rev": "7fa01f47177345bf699a3c5700f13838841655f2"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdkcomponent",
-			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
+			"Rev": "7fa01f47177345bf699a3c5700f13838841655f2"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdkmanager",
-			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
+			"Rev": "7fa01f47177345bf699a3c5700f13838841655f2"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-steputils/tools",
-			"Rev": "557edc7229adb6035129176478e96616180df77c"
+			"Rev": "e737fab2504923be01c758731dde689f3286c0b5"
 		},
 		{
 			"ImportPath": "github.com/hashicorp/go-version",
