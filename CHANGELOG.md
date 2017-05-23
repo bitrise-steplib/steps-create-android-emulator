@@ -1,6 +1,11 @@
-## Changelog (Current version: 1.1.3)
+## Changelog (Current version: 1.1.4)
 
 -----------------
+
+### 1.1.4 (2017 May 23)
+
+* [a3baaaf] Prepare for 1.1.4
+* [8c5899f] Updated system image check (#19)
 
 ### 1.1.3 (2017 May 16)
 
@@ -47,4 +52,4 @@
 
 -----------------
 
-Updated: 2017 May 16
+Updated: 2017 May 23
