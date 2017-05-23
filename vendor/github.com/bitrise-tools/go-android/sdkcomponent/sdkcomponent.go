@@ -167,7 +167,7 @@ func (component SystemImage) InstallPathInAndroidHome() string {
 
 // InstallationIndicatorFile ...
 func (component SystemImage) InstallationIndicatorFile() string {
-	return "package.xml"
+	return "system.img"
 }
 
 // Extras ...
