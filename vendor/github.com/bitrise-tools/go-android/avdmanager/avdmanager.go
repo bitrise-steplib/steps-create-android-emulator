@@ -81,19 +81,18 @@ func New(sdk sdk.AndroidSdkInterface) (*Model, error) {
 
 // CreateAVDCommand ...
 func (model Model) CreateAVDCommand(name string, systemImage sdkcomponent.SystemImage, options ...string) *command.Model {
+	args := []string{"--verbose", "create", "avd", "--force", "--name", name, "--abi", systemImage.ABI}
+
 	if model.legacy {
-		args := []string{"create", "avd", "--force", "--name", name, "--target", systemImage.Platform, "--abi", systemImage.ABI}
-		if systemImage.Tag != "" && systemImage.Tag != "default" {
-			args = append(args, "--tag", systemImage.Tag)
-		}
-		args = append(args, options...)
-		return command.New(model.binPth, args...)
+		args = append(args, "--target", systemImage.Platform)
+	} else {
+		args = append(args, "--package", systemImage.GetSDKStylePath())
 	}
 
-	args := []string{"create", "avd", "--force", "--package", systemImage.GetSDKStylePath(), "--name", name, "--abi", systemImage.ABI}
 	if systemImage.Tag != "" && systemImage.Tag != "default" {
 		args = append(args, "--tag", systemImage.Tag)
 	}
+
 	args = append(args, options...)
 	return command.New(model.binPth, args...)
 }
