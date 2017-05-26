@@ -66,33 +66,6 @@ workflows:
         inputs:
         - content: |
             echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
-    # ---
-    - path::./:
-        title: Create android-24-google_apis_playstore-x86
-        inputs:
-        - name: android-24-google_apis_playstore-x86
-        - platform: android-24
-        - tag: google_apis_playstore
-        - abi: x86
-    - script:
-        title: Output test
-        is_always_run: true
-        inputs:
-        - content: |
-            echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
-    # ---
-    - path::./:
-        title: Create android-17-default-mips
-        inputs:
-        - name: android-17-default-mips
-        - platform: android-17
-        - abi: mips
-    - script:
-        title: Output test
-        is_always_run: true
-        inputs:
-        - content: |
-            echo "BITRISE_EMULATOR_NAME: $BITRISE_EMULATOR_NAME"
 
   go-tests:
     before_run:

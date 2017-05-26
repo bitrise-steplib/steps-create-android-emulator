@@ -66,18 +66,19 @@ func (configs ConfigsModel) validate() error {
 		return errors.New("no Platform parameter specified")
 	}
 
-	validAbis := []string{"armeabi-v7a", "arm64-v8a", "mips", "x86", "x86_64"}
 	if configs.Abi == "" {
 		return errors.New("no Abi parameter specified")
-	} else if !isValueValid(configs.Abi, validAbis) {
-		return fmt.Errorf("invalid Abi parameter specified (%s), valid options: %s", configs.Abi, validAbis)
+	} else if configs.Abi != "armeabi-v7a" {
+		return fmt.Errorf("invalid Abi parameter specified (%s), valid option: armeabi-v7a", configs.Abi)
 	}
 
-	validTags := []string{"default", "google_apis", "google_apis_playstore", "android-tv", "android-wear"}
 	if configs.Tag == "" {
 		return errors.New("no Tag parameter specified")
-	} else if !isValueValid(configs.Tag, validTags) {
-		return fmt.Errorf("invalid Tag parameter specified (%s), valid options: %s", configs.Tag, validTags)
+	} else if configs.Tag != "default" &&
+		configs.Tag != "google_apis" &&
+		configs.Tag != "android-tv" &&
+		configs.Tag != "android-wear" {
+		return fmt.Errorf("invalid Tag parameter specified (%s), valid options: [default, google_apis, android-tv, android-wear]", configs.Tag)
 	}
 
 	if configs.AndroidHome == "" {
@@ -85,15 +86,6 @@ func (configs ConfigsModel) validate() error {
 	}
 
 	return nil
-}
-
-func isValueValid(value string, validValues []string) bool {
-	for _, v := range validValues {
-		if v == value {
-			return true
-		}
-	}
-	return false
 }
 
 func fail(format string, v ...interface{}) {
