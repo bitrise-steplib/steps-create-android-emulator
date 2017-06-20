@@ -37,10 +37,21 @@ inputs:
   - abi: armeabi-v7a
     opts:
       title: "The ABI to use for the AVD"
-      description: |
-        The ABI to use for the AVD.
+      description: |-
+        The ABI to use for the AVD. Availability depends on API level:
+        - `armeabi-v7a` - entire API levels
+        - `arm64-v8a` - 24 or newer
+        - `mips` - 15, 16, 17
+        - `x86` - entire API levels
+        - `x86_64` - 21 or newer
+        Note that x86 and x86_64 emulators won't work on default bitrise.io stack.
       is_required: true
-      is_dont_change_value: true
+      value_options:
+      - "armeabi-v7a"
+      - "arm64-v8a"
+      - "x86"
+      - "x86_64"
+      - "mips"
   - tag: "default"
     opts:
       title: "The sys-img tag to use for the AVD"
@@ -52,6 +63,7 @@ inputs:
       - "google_apis"
       - "android-tv"
       - "android-wear"
+      - "google_apis_playstore"
   - options: ""
     opts:
       title: Additional options for `android create avd` call
