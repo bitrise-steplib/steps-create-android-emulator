@@ -1,6 +1,13 @@
-## Changelog (Current version: 1.1.4)
+## Changelog (Current version: 1.1.5)
 
 -----------------
+
+### 1.1.5 (2017 Jun 20)
+
+* [04d9ff5] Prepare for 1.1.5
+* [30dc2c2] Reapply "Added ability to change ABI (#17)" after go-android integration tests update (#20)
+* [5ad68db] Revert "Added ability to change ABI (#17)"
+* [b2c364d] Added ability to change ABI (#17)
 
 ### 1.1.4 (2017 May 23)
 
@@ -52,4 +59,4 @@
 
 -----------------
 
-Updated: 2017 May 23
+Updated: 2017 Jun 20
