@@ -278,5 +278,5 @@ func main() {
 	if err := tools.ExportEnvironmentWithEnvman(bitriseEmulatorName, configs.Name); err != nil {
 		fail("Failed to export %s, error: %s", bitriseEmulatorName, err)
 	}
-	log.Donef("Emaultor name is exported in environment variable: %s (value: %s)", bitriseEmulatorName, configs.Name)
+	log.Donef("Emulator name is exported in environment variable: %s (value: %s)", bitriseEmulatorName, configs.Name)
 }
