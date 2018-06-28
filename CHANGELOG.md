@@ -1,6 +1,12 @@
-## Changelog (Current version: 1.1.5)
+## Changelog (Current version: 1.1.6)
 
 -----------------
+
+### 1.1.6 (2018 Jun 28)
+
+* [a195608] Prepare for 1.1.6
+* [79e8752] Update bitrise yml and dependency manager (#24)
+* [a0269f4] Fix typo for emulator (#23)
 
 ### 1.1.5 (2017 Jun 20)
 
@@ -59,4 +65,4 @@
 
 -----------------
 
-Updated: 2017 Jun 20
+Updated: 2018 Jun 28
