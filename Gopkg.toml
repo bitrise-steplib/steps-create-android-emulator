@@ -1,0 +1,19 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/bitrise-io/go-utils"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/bitrise-tools/go-android"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/bitrise-tools/go-steputils"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/kballard/go-shellquote"
+
+[prune]
+  go-tests = true
+  unused-packages = true
