@@ -77,12 +77,12 @@ inputs:
         `avdmanager create avd --force --package PACKAGE --name name --abi abi options`
 
         You can use multiple options, separated by a space
-        character. Example: `--skin WVGA800`
+        character. For example: `--skin WVGA800`
   - custom_hardware_profile_content:
     opts:
       title: Custom Hardware Profile Content
       description: |-
-        The value of this input will be written into `${name}.avd/config.ini` file,
+        The value of this input will be written into `${name}.avd/config.ini` file
         to let the created emulator use your custom hardware profile.
 
         Format example:
