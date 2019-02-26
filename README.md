@@ -1,4 +1,9 @@
+
 # Create Android Emulator
+
+__WARNING:
+This step is deprecated, use [AVD Manager](https://github.com/bitrise-steplib/steps-avd-manager) step instead.
+Will be removed by 2019-08-25.__
 
 Create Android Emulator
 
